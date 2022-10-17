@@ -23,7 +23,6 @@ class ListActivity : AppCompatActivity() {
             val food = findViewById<EditText>(R.id.FoodText).text.toString()
             val calorie = findViewById<EditText>(R.id.CalorieText).text.toString()
 
-            //TODO save into database
             lifecycleScope.launch(IO) {
                 (application as MyApplication).db.entityDao().insert(
                     Entity(food, calorie)

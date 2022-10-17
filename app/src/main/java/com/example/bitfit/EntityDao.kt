@@ -18,4 +18,13 @@ interface EntityDao {
 
     @Query("DELETE FROM entity_table")
     fun deleteAll()
+
+    @Query("SELECT AVG(value) FROM entity_table")
+    fun avgValues() : String
+
+    @Query("SELECT MAX(value) FROM entity_table")
+    fun maxValues() : String
+
+    @Query("SELECT MIN(value) FROM entity_table")
+    fun minValues() : String
 }

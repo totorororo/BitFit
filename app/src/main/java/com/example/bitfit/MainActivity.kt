@@ -3,51 +3,40 @@ package com.example.bitfit
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.widget.Button
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
-    val items = mutableListOf<Item>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_activity)
 
-        val rvItems = findViewById<View>(R.id.entityRV) as RecyclerView
-        val adapter = EntityAdapter(this, items)
+        val fragmentManager: FragmentManager = supportFragmentManager
 
-        lifecycleScope.launch {
+        // define your fragments here
+        val logsFragment: Fragment = LogListFragment()
+        val dashboardListFragment: Fragment = DashboardFragment()
 
-        Log.println(Log.ASSERT, items.toString(), "CHECK")
-            (application as MyApplication).db.entityDao().getAll().collect { databaseList ->
-                databaseList.map { entity ->
-                    Item(
-                        entity.titleDesc,
-                        entity.value
-                    )
-                }.also { mappedList ->
-                    //items.clear()
-                    items.addAll(mappedList)
-                    adapter.notifyItemInserted(items.size-1)
-                }
+        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
+
+
+        // handle navigation selection
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            lateinit var fragment: Fragment
+            when (item.itemId) {
+                R.id.action_logs -> fragment = logsFragment
+                R.id.action_dashboard -> fragment = dashboardListFragment
             }
-            Log.println(Log.ASSERT, items.toString(), "CHECK")
+            replaceFragment(fragment)
+            true
         }
 
-
-
-        rvItems.layoutManager = LinearLayoutManager(this).also {
-            val dividerItemDecoration = DividerItemDecoration(this, it.orientation)
-            rvItems.addItemDecoration(dividerItemDecoration)
-        }
-        rvItems.adapter = adapter
+        // Set default selection
+        bottomNavigationView.selectedItemId = R.id.action_logs
 
 
         findViewById<Button>(R.id.AddButton).setOnClickListener {
@@ -59,6 +48,14 @@ class MainActivity : AppCompatActivity() {
             //i.putExtra("item", itemsList)
             startActivity(i)
         }
+
+    }
+
+    private fun replaceFragment(AllFragment: Fragment) {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.log_frame_layout, AllFragment)
+        fragmentTransaction.commit()
     }
 
 
